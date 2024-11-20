@@ -1,5 +1,6 @@
 import sequelizeConnection from './config';
 import { Team } from './models'
+import TeamMember from './models/team-member-model.sequelize';
 import User from './models/user-model.sequelize'
 
 const dbInit = async() => {
@@ -8,9 +9,11 @@ const dbInit = async() => {
 
     // Delete all tables
     await Promise.all([
-        sequelizeConnection.query('DROP TABLE IF EXISTS teammember'),
+        sequelizeConnection.query('DROP TABLE IF EXISTS team_member'),
         Team.drop(),
         User.drop(),
+        TeamMember.drop(),
+        
     ]);
 
     // Enable foreign key checks
@@ -20,6 +23,7 @@ const dbInit = async() => {
      Promise.all([
         Team.sync({ alter: true }),
         User.sync({ alter: true }),
+        TeamMember.sync({ alter: true }),
         sequelizeConnection.sync(),
     ]);
 }

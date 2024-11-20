@@ -1,6 +1,5 @@
 import { DataTypes, Model, Optional } from 'sequelize';
 import sequelizeConnection from '../config';
-import Team from './team-model.sequelize';
 interface UserAttributes {
     id: number;
     username: string;
@@ -68,8 +67,5 @@ User.init(
         createdAt: 'user_created_at',
     }
 );
-
-User.belongsToMany(Team, { through: 'teammember', foreignKey: 'user_id', timestamps: false });
-Team.belongsToMany(User, { through: 'teammember', foreignKey: 'team_id', timestamps: false }); 
 
 export default User;
