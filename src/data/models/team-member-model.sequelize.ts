@@ -1,4 +1,4 @@
-import { DataTypes, Model, Optional } from 'sequelize';
+import { DataTypes, Model, } from 'sequelize';
 import sequelizeConnection from '../config';
 import User from './user-model.sequelize';
 import Team from './team-model.sequelize';
@@ -49,5 +49,4 @@ TeamMember.init(
 
 User.belongsToMany(Team, { through: TeamMember, foreignKey: 'team_id', foreignKeyConstraint: true });
 Team.belongsToMany(User, { through: TeamMember, foreignKey: 'user_id', foreignKeyConstraint: true }); 
-
 export default TeamMember;
