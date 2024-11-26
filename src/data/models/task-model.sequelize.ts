@@ -1,73 +1,83 @@
-import { DataTypes, Model, Optional } from 'sequelize';
-import sequelizeConnection from '../config'; // Ajusta la ruta según sea necesario
-import Team from './team-model.sequelize'; // Modelo Team
+import { DataTypes, HasOneSetAssociationMixin, Model, Optional } from 'sequelize';
+import sequelizeConnection from '../config';
+import Project from './project-model.sequelize';
+import User from './user-model.sequelize';
+import TaskStatus from './taskstatus-model.sequelize';
 
-interface ProjectAttributes {
+interface TaskAttributes {
     id: string;
-    projectName: string;
-    projectBeginDate: string;
-    projectEndDate: string;
-    projectAssignedTeamId: string; // FK de Teams
-    projectDescription: string;
+    name: string;
+    description: string;
+    beginDate: string;
+    endDate: string;
     createdAt?: Date;
     updatedAt?: Date;
 }
 
-interface ProjectCreationAttributes extends Optional<ProjectAttributes, 'id'> {}
+interface TaskCreationAttributes extends Optional<TaskAttributes, 'id'> {}
 
-class Project extends Model<ProjectAttributes, ProjectCreationAttributes> implements ProjectAttributes {
+class Task extends Model<TaskAttributes, TaskCreationAttributes> implements TaskAttributes {
     public id!: string;
-    public projectName!: string;
-    public projectBeginDate!: string;
-    public projectEndDate!: string;
-    public projectAssignedTeamId!: string;
-    public projectDescription!: string;
+    public name!: string;
+    public description!: string;
+    public beginDate!: string;
+    public endDate!: string;
     public readonly createdAt!: Date;
     public readonly updatedAt!: Date;
+
+    declare setCreator: HasOneSetAssociationMixin<User, User['id']>;
+    declare setAssignee: HasOneSetAssociationMixin<User, User['id']>;
+    declare setProject: HasOneSetAssociationMixin<Project, Project['id']>;
+    declare setStatus: HasOneSetAssociationMixin<TaskStatus, TaskStatus['id']>;
 }
 
-Project.init(
+Task.init(
     {
         id: {
-            type: DataTypes.STRING(100),
+            type: DataTypes.INTEGER.UNSIGNED,
             primaryKey: true,
-            field: 'id',
+            autoIncrement: true,
+            field: 'task_id',
         },
-        projectName: {
+        name: {
             type: DataTypes.STRING(100),
             allowNull: true,
-            field: 'project_name',
+            field: 'task_name',
         },
-        projectBeginDate: {
-            type: DataTypes.STRING(45),
-            allowNull: true,
-            field: 'project_begin_date',
-        },
-        projectEndDate: {
-            type: DataTypes.STRING(45),
-            allowNull: true,
-            field: 'project_end_date',
-        },
-        projectAssignedTeamId: {
-            type: DataTypes.STRING(100),
-            allowNull: false,
-            field: 'project_assigned_team_id',
-        },
-        projectDescription: {
+        description: {
             type: DataTypes.STRING(200),
             allowNull: true,
-            field: 'project_description',
+            field: 'task_description',
+        },
+        beginDate: {
+            type: DataTypes.STRING(45),
+            allowNull: true,
+            field: 'task_begin_date',
+        },
+        endDate: {
+            type: DataTypes.STRING(45),
+            allowNull: true,
+            field: 'task_end_date',
         },
     },
     {
-        tableName: 'projects',
+        tableName: 'task',
         sequelize: sequelizeConnection,
-        updatedAt: 'project_updated_at',
-        createdAt: 'project_created_at',
+        updatedAt: 'task_updated_at',
+        createdAt: 'task_created_at',
     }
 );
 
 // Relación: Un proyecto pertenece a un equipo
-Project.belongsTo(Team, { foreignKey: 'projectAssignedTeamId', as: 'assignedTeam' });
+Task.belongsTo(Project, { foreignKey: 'project_id', as: 'project' });
+Project.hasMany(Task, { foreignKey: 'project_id', as: 'tasks' });
 
-export default Project;
+Task.belongsTo(User, { foreignKey: 'creator_id', as: 'creator' });
+User.hasMany(Task, { foreignKey: 'creator_id', as: 'created_tasks' });
+
+Task.belongsTo(User, { foreignKey: 'assignee_id', as: 'assignee' });
+User.hasMany(Task, { foreignKey: 'assignee_id', as: 'assigned_tasks' });
+
+Task.belongsTo(TaskStatus, { foreignKey: 'task_status_id', as: 'status' });
+TaskStatus.hasOne(Task, { foreignKey: 'task_status_id', as: 'task' });
+export default Task;

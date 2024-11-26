@@ -20,18 +20,23 @@ FavoriteProject.init(
             primaryKey: true,
             field: 'project_id',
         },
+        favorite_flag: {
+            type: DataTypes.BOOLEAN,
+            allowNull: false,
+        },
     },
     {
-        tableName: 'favoriteprojects',
+        tableName: 'favorite_project',
         sequelize: sequelizeConnection,
-        timestamps: false,
+        updatedAt: 'favorite_project_updated_at',
+        createdAt: 'favorite_project_created_at',
     }
 );
 
 // Relación: Un usuario puede tener muchos proyectos favoritos
-User.belongsToMany(Project, { through: FavoriteProject, foreignKey: 'user_id', timestamps: false });
+User.belongsToMany(Project, { through: FavoriteProject, foreignKey: 'user_id'});
 
 // Relación: Un proyecto puede ser marcado como favorito por muchos usuarios
-Project.belongsToMany(User, { through: FavoriteProject, foreignKey: 'project_id', timestamps: false });
+Project.belongsToMany(User, { through: FavoriteProject, foreignKey: 'project_id'});
 
 export default FavoriteProject;

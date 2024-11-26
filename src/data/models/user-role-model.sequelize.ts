@@ -32,7 +32,7 @@ Role.init(
         },
     },
     {
-        tableName: 'roles',
+        tableName: 'role',
         sequelize: sequelizeConnection,
         updatedAt: 'role_updated_at',
         createdAt: 'role_created_at',

@@ -31,7 +31,7 @@ TaskStatus.init(
         },
     },
     {
-        tableName: 'taskstatuses',
+        tableName: 'taskstatus',
         sequelize: sequelizeConnection,
         updatedAt: 'taskstatus_updated_at',
         createdAt: 'taskstatus_created_at',

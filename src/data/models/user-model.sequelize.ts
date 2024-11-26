@@ -1,5 +1,7 @@
-import { DataTypes, Model, Optional } from 'sequelize';
+import { BelongsToManyGetAssociationsMixin, DataTypes, HasManyGetAssociationsMixin, HasManyGetAssociationsMixinOptions, Model, Optional } from 'sequelize';
 import sequelizeConnection from '../config';
+import Role from './user-role-model.sequelize';
+import Team from './team-model.sequelize';
 interface UserAttributes {
     id: number;
     username: string;
@@ -11,7 +13,9 @@ interface UserAttributes {
     updatedAt?: Date;
 }
 
-interface UserCreationAttributes extends Optional<UserAttributes, 'id'> {}
+export interface UserCreationAttributes extends Optional<UserAttributes, 'id'> {
+    role?: Role;
+}
 
 class User extends Model<UserAttributes, UserCreationAttributes> implements UserAttributes {
     public id!: number;
@@ -22,6 +26,11 @@ class User extends Model<UserAttributes, UserCreationAttributes> implements User
     public lastname!: string;
     public readonly createdAt!: Date;
     public readonly updatedAt!: Date;
+
+    declare getTeams: BelongsToManyGetAssociationsMixin<Team>;
+
+    declare getOwnerTeam: HasManyGetAssociationsMixin<Team>;
+
 }
 
 User.init(
@@ -61,11 +70,14 @@ User.init(
         },
     },
     {
-        tableName: 'users',
+        tableName: 'user',
         sequelize: sequelizeConnection, // passing the `sequelize` instance is required
         updatedAt: 'user_updated_at',
         createdAt: 'user_created_at',
     }
 );
+
+User.belongsTo(Role, { foreignKey: 'role_id', as: 'role' });
+Role.hasMany(User, { foreignKey: 'role_id', as: 'user' });
 
 export default User;

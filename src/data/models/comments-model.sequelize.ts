@@ -5,9 +5,7 @@ import Task from './team-model.sequelize';
 
 interface CommentAttributes {
     id: string;
-    commentOwnerId: string; // FK de User
     commentText: string;
-    commentTaskId: string; // FK de Task
     createdAt?: Date;
     updatedAt?: Date;
 }
@@ -16,9 +14,7 @@ interface CommentCreationAttributes extends Optional<CommentAttributes, 'id'> {}
 
 class Comment extends Model<CommentAttributes, CommentCreationAttributes> implements CommentAttributes {
     public id!: string;
-    public commentOwnerId!: string;
     public commentText!: string;
-    public commentTaskId!: string;
     public readonly createdAt!: Date;
     public readonly updatedAt!: Date;
 }
@@ -28,26 +24,16 @@ Comment.init(
         id: {
             type: DataTypes.STRING(100),
             primaryKey: true,
-            field: 'id',
-        },
-        commentOwnerId: {
-            type: DataTypes.STRING(100),
-            allowNull: false,
-            field: 'comment_owner_id',
+            field: 'comment_id',
         },
         commentText: {
             type: DataTypes.STRING(100),
             allowNull: true,
             field: 'comment_text',
         },
-        commentTaskId: {
-            type: DataTypes.STRING(100),
-            allowNull: false,
-            field: 'comment_task_id',
-        },
     },
     {
-        tableName: 'comments',
+        tableName: 'comment',
         sequelize: sequelizeConnection,
         updatedAt: 'comment_updated_at',
         createdAt: 'comment_created_at',
@@ -55,9 +41,9 @@ Comment.init(
 );
 
 // Relación: Comentarios pertenecen a un usuario
-Comment.belongsTo(User, { foreignKey: 'commentOwnerId', as: 'owner' });
-
+Comment.belongsTo(User, { foreignKey: 'comment_owner_id', as: 'owner' });
+User.hasMany(Comment, { foreignKey: 'comment_owner_id', as: 'comments' });
 // Relación: Comentarios pertenecen a una tarea
-Comment.belongsTo(Task, { foreignKey: 'commentTaskId', as: 'task' });
-
+Comment.belongsTo(Task, { foreignKey: 'comment_task_id', as: 'task' });
+Task.hasMany(Comment, { foreignKey: 'comment_task_id', as: 'comments' });
 export default Comment;

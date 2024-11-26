@@ -1,4 +1,4 @@
-import { DataTypes, Model, } from 'sequelize';
+import { DataTypes, HasManyGetAssociationsMixinOptions, Model, } from 'sequelize';
 import sequelizeConnection from '../config';
 import User from './user-model.sequelize';
 import Team from './team-model.sequelize';
@@ -12,7 +12,9 @@ interface TeamMemberAttributes {
 }
 
 // Define the creation attributes for the TeamMember model
-interface TeamMemberCreationAttributes extends TeamMemberAttributes {}
+interface TeamMemberCreationAttributes extends TeamMemberAttributes {
+
+}
 
 // Define the TeamMember model class
 class TeamMember extends Model<TeamMemberAttributes, TeamMemberCreationAttributes> implements TeamMemberAttributes {
@@ -40,13 +42,13 @@ TeamMember.init(
         },
     },
     {
-        sequelize: sequelizeConnection, // This should be replaced with your actual Sequelize instance
+        sequelize: sequelizeConnection,
         tableName: 'team_member',
         updatedAt: 'team_member_updated_at',
         createdAt: 'team_member_created_at',
     }
 );
 
-User.belongsToMany(Team, { through: TeamMember, foreignKey: 'team_id', foreignKeyConstraint: true });
-Team.belongsToMany(User, { through: TeamMember, foreignKey: 'user_id', foreignKeyConstraint: true }); 
+User.belongsToMany(Team, { through: TeamMember, foreignKey: 'user_id', foreignKeyConstraint: true });
+Team.belongsToMany(User, { through: TeamMember, foreignKey: 'team_id', foreignKeyConstraint: true }); 
 export default TeamMember;

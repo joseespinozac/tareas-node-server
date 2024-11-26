@@ -1,4 +1,4 @@
-import { DataTypes, Model, Optional } from 'sequelize';
+import { DataTypes, HasOneGetAssociationMixin, HasOneSetAssociationMixin, Model, Optional } from 'sequelize';
 import sequelizeConnection from '../config'; // Ajusta la ruta según sea necesario
 import Team from './team-model.sequelize'; // Modelo Team
 
@@ -7,7 +7,6 @@ interface ProjectAttributes {
     projectName: string;
     projectBeginDate: string;
     projectEndDate: string;
-    projectAssignedTeamId: string; // FK de Teams
     projectDescription: string;
     createdAt?: Date;
     updatedAt?: Date;
@@ -20,18 +19,21 @@ class Project extends Model<ProjectAttributes, ProjectCreationAttributes> implem
     public projectName!: string;
     public projectBeginDate!: string;
     public projectEndDate!: string;
-    public projectAssignedTeamId!: string;
     public projectDescription!: string;
     public readonly createdAt!: Date;
     public readonly updatedAt!: Date;
+
+    declare setTeam: HasOneSetAssociationMixin<Team, Team['id']>;
+    declare getTeam: HasOneGetAssociationMixin<Team>;
 }
 
 Project.init(
     {
         id: {
-            type: DataTypes.STRING(100),
+            type: DataTypes.INTEGER.UNSIGNED,
             primaryKey: true,
-            field: 'id',
+            field: 'project_id',
+            autoIncrement: true,
         },
         projectName: {
             type: DataTypes.STRING(100),
@@ -48,11 +50,6 @@ Project.init(
             allowNull: true,
             field: 'project_end_date',
         },
-        projectAssignedTeamId: {
-            type: DataTypes.STRING(100),
-            allowNull: false,
-            field: 'project_assigned_team_id',
-        },
         projectDescription: {
             type: DataTypes.STRING(200),
             allowNull: true,
@@ -68,6 +65,9 @@ Project.init(
 );
 
 // Relación: Un proyecto pertenece a un equipo
-Project.belongsTo(Team, { foreignKey: 'projectAssignedTeamId', as: 'assignedTeam' });
+
 
 export default Project;
+
+// Team.belongsTo(User, { as: 'owner', foreignKey: 'owner_id' });
+// User.hasOne(Team, { as: 'ownerTeam', foreignKey: 'owner_id' });
