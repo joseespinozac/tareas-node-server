@@ -3,7 +3,7 @@ import sequelizeConnection from '../config'; // Ajusta la ruta según sea necesa
 import Team from './team-model.sequelize'; // Modelo Team
 
 interface ProjectAttributes {
-    id: string;
+    id: number;
     projectName: string;
     projectBeginDate: string;
     projectEndDate: string;
@@ -15,7 +15,7 @@ interface ProjectAttributes {
 interface ProjectCreationAttributes extends Optional<ProjectAttributes, 'id'> {}
 
 class Project extends Model<ProjectAttributes, ProjectCreationAttributes> implements ProjectAttributes {
-    public id!: string;
+    public id!: number;
     public projectName!: string;
     public projectBeginDate!: string;
     public projectEndDate!: string;

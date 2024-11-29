@@ -1,11 +1,12 @@
-import { DataTypes, HasOneSetAssociationMixin, Model, Optional } from 'sequelize';
+import { DataTypes, HasManyGetAssociationsMixin, HasOneSetAssociationMixin, Model, Optional } from 'sequelize';
 import sequelizeConnection from '../config';
 import Project from './project-model.sequelize';
 import User from './user-model.sequelize';
 import TaskStatus from './taskstatus-model.sequelize';
+import Comment from './comments-model.sequelize';
 
 interface TaskAttributes {
-    id: string;
+    id: number;
     name: string;
     description: string;
     beginDate: string;
@@ -17,7 +18,7 @@ interface TaskAttributes {
 interface TaskCreationAttributes extends Optional<TaskAttributes, 'id'> {}
 
 class Task extends Model<TaskAttributes, TaskCreationAttributes> implements TaskAttributes {
-    public id!: string;
+    public id!: number;
     public name!: string;
     public description!: string;
     public beginDate!: string;
@@ -29,6 +30,7 @@ class Task extends Model<TaskAttributes, TaskCreationAttributes> implements Task
     declare setAssignee: HasOneSetAssociationMixin<User, User['id']>;
     declare setProject: HasOneSetAssociationMixin<Project, Project['id']>;
     declare setStatus: HasOneSetAssociationMixin<TaskStatus, TaskStatus['id']>;
+    declare getComments: HasManyGetAssociationsMixin<Comment>;
 }
 
 Task.init(
@@ -45,7 +47,7 @@ Task.init(
             field: 'task_name',
         },
         description: {
-            type: DataTypes.STRING(200),
+            type: DataTypes.TEXT,
             allowNull: true,
             field: 'task_description',
         },
@@ -69,15 +71,15 @@ Task.init(
 );
 
 // Relación: Un proyecto pertenece a un equipo
-Task.belongsTo(Project, { foreignKey: 'project_id', as: 'project' });
-Project.hasMany(Task, { foreignKey: 'project_id', as: 'tasks' });
+Task.belongsTo(Project, { foreignKey: 'project_id', as: 'project', onDelete: 'CASCADE' });
+Project.hasMany(Task, { foreignKey: 'project_id', as: 'tasks', onDelete: 'CASCADE' });
 
-Task.belongsTo(User, { foreignKey: 'creator_id', as: 'creator' });
-User.hasMany(Task, { foreignKey: 'creator_id', as: 'created_tasks' });
+Task.belongsTo(User, { foreignKey: 'creator_id', as: 'creator', onDelete: 'CASCADE' });
+User.hasMany(Task, { foreignKey: 'creator_id', as: 'created_tasks', onDelete: 'CASCADE' });
 
-Task.belongsTo(User, { foreignKey: 'assignee_id', as: 'assignee' });
-User.hasMany(Task, { foreignKey: 'assignee_id', as: 'assigned_tasks' });
+Task.belongsTo(User, { foreignKey: 'assignee_id', as: 'assignee', onDelete: 'CASCADE' });
+User.hasMany(Task, { foreignKey: 'assignee_id', as: 'assigned_tasks', onDelete: 'CASCADE' });
 
-Task.belongsTo(TaskStatus, { foreignKey: 'task_status_id', as: 'status' });
-TaskStatus.hasOne(Task, { foreignKey: 'task_status_id', as: 'task' });
+Task.belongsTo(TaskStatus, { foreignKey: 'task_status_id', as: 'status', onDelete: 'CASCADE' });
+TaskStatus.hasOne(Task, { foreignKey: 'task_status_id', as: 'task', onDelete: 'CASCADE' });
 export default Task;

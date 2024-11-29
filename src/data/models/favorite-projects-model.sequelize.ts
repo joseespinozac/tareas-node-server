@@ -3,26 +3,30 @@ import sequelizeConnection from '../config'; // Ajusta la ruta según sea necesa
 import User from './user-model.sequelize'; // Modelo User
 import Project from './project-model.sequelize'; // Modelo Project
 
-class FavoriteProject extends Model {
-    public userId!: string;
-    public projectId!: string;
+
+interface FavoriteProjectAttributes {
+    userId: number;
+    projectId: number;
+}
+
+interface FavoriteProjectCreationAttributes extends FavoriteProjectAttributes {}
+
+class FavoriteProject extends Model<FavoriteProjectAttributes, FavoriteProjectCreationAttributes> implements FavoriteProjectAttributes {
+    public userId!: number;
+    public projectId!: number;
 }
 
 FavoriteProject.init(
     {
         userId: {
-            type: DataTypes.STRING(100),
+            type: DataTypes.INTEGER.UNSIGNED,
             primaryKey: true,
             field: 'user_id',
         },
         projectId: {
-            type: DataTypes.STRING(100),
+            type: DataTypes.INTEGER.UNSIGNED,
             primaryKey: true,
             field: 'project_id',
-        },
-        favorite_flag: {
-            type: DataTypes.BOOLEAN,
-            allowNull: false,
         },
     },
     {

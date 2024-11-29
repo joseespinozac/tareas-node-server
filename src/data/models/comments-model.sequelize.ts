@@ -1,10 +1,10 @@
-import { DataTypes, Model, Optional } from 'sequelize';
+import { DataTypes, HasOneSetAssociationMixin, Model, Optional } from 'sequelize';
 import sequelizeConnection from '../config'; // Ajusta la ruta según sea necesario
 import User from './user-model.sequelize';
-import Task from './team-model.sequelize';
+import Task from './task-model.sequelize';
 
 interface CommentAttributes {
-    id: string;
+    id: number;
     commentText: string;
     createdAt?: Date;
     updatedAt?: Date;
@@ -13,21 +13,25 @@ interface CommentAttributes {
 interface CommentCreationAttributes extends Optional<CommentAttributes, 'id'> {}
 
 class Comment extends Model<CommentAttributes, CommentCreationAttributes> implements CommentAttributes {
-    public id!: string;
+    public id!: number;
     public commentText!: string;
     public readonly createdAt!: Date;
     public readonly updatedAt!: Date;
+
+    declare setOwner: HasOneSetAssociationMixin<User, User['id']>;
+    declare setTask: HasOneSetAssociationMixin<Task, Task['id']>;
 }
 
 Comment.init(
     {
         id: {
-            type: DataTypes.STRING(100),
+            type: DataTypes.INTEGER.UNSIGNED,
             primaryKey: true,
+            autoIncrement: true,
             field: 'comment_id',
         },
         commentText: {
-            type: DataTypes.STRING(100),
+            type: DataTypes.TEXT,
             allowNull: true,
             field: 'comment_text',
         },

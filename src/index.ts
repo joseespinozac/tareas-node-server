@@ -11,7 +11,7 @@ export const get = () => {
   const app: Application = express()
 
   app.use(cors({
-    origin: 'http://localhost:4200'
+    origin: 'http://localhost:4200',
   }));
 
   // Body parsing Middleware
