@@ -14,6 +14,7 @@ const dbPassword = config.password as string
 
 const sequelizeConnection = new Sequelize(dbName, dbUser, dbPassword, {
   host: dbHost,
+  port: 3306,
   dialect: dbDriver
 })
 
